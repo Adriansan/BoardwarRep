@@ -11,3 +11,7 @@ Material::Material(tipo auxTipo)
 Material::~Material(void)
 {
 }
+
+tipo Material::getTipo(){
+	return miTipo;
+}

@@ -234,6 +234,9 @@ void Tablero::AsignarCentroProvincias(int idProvincia){
 			}
 		}
 	}
+	if (cantidad == 0){
+		cantidad = 1;
+	}
 	auxCentro[0] = sumax / cantidad;
 	auxCentro[1] = sumay / cantidad;
 	listaProvincias[idProvincia]->setCentroProvincia(auxCentro);

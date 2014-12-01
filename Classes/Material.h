@@ -12,5 +12,6 @@ private:
 
 public:
 	Material(tipo auxTipo);
+	tipo getTipo();
 	~Material(void);
 };

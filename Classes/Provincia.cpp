@@ -88,3 +88,7 @@ int Provincia::getPerteneceIdJugador(void){
 void Provincia::setPerteneceIdJugador(int idJugador){
 	perteneceIdJugador = idJugador;
 }
+
+Material* Provincia::getMaterial(){
+	return recurso;
+}

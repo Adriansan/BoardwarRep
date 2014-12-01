@@ -31,6 +31,7 @@ public:
 	void setCentroProvincia(int auxCentro[2]);
 	int getLegiones(void);
 	void setLegiones(int auxLegiones);
+	Material* getMaterial();
 	Provincia(int auxId);
 	~Provincia(void);
 };

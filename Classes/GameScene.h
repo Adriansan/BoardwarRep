@@ -18,8 +18,10 @@ private:
 	float tiempopartida;
 	int turnojugador;
 	bool pasado;
+	bool enPartida;
 	LabelTTF* _etiquetasSoldados[numeros];
 	LabelTTF* turno;
+	LabelTTF* informacionProvincia;
 	Sprite* _backgroundArray[largo][largo];
 	Menu* botonFinTurno;
 	Tablero* miTablero;
@@ -39,7 +41,7 @@ public:
     
     // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
-	void goToMainMenu(Ref *pSender);	void InicioJuego();	void CambiarTurnoJuego();	void CambiarTurnoUsuario(Ref *pSender);	void AsignacionLegiones();	void AtacarProvincia(int idProvinciaOrigen, int idProvinciaDestino);	void update(float dt);	void Redibujar();
+	void goToMainMenu(Ref *pSender);	void VolverAEscoger(Ref *pSender);	void EmpezarPartida(Ref *pSender);	void InicioJuego();	void CambiarTurnoJuego();	void CambiarTurnoUsuario(Ref *pSender);	void AsignacionLegiones();	void AtacarProvincia(int idProvinciaOrigen, int idProvinciaDestino);	void MostrarProvincia(int idProvincia);	void update(float dt);	void Redibujar();
 	void ClickRaton(Event *event);
 	void AccionesIA();
 	bool DeteccionFin();
