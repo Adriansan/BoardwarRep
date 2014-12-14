@@ -329,12 +329,38 @@ void GameScene::Redibujar() {
 	removeAllChildren();
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	cocos2d::Color3B color;
+	Sprite* frontera;
 	int i;
 	int j;
+	int z;
 	for (i = 0; i<largo; i++){
 		for (j = 0; j<largo; j++){
 			_backgroundArray[i][j] = Sprite::create("hexagono.png");
 			int auxIdProvincia = miTablero->matrizMapa[i][j];
+			for (z = 0; z < 3; z++){
+				if (miTablero->matrizMapaFrontera[i][j][z]){
+					switch (z){
+					case 0:
+						frontera = Sprite::create("Fi.png");
+						break;
+
+					case 1:
+						frontera = Sprite::create("Fa.png");
+						break;
+
+					case 2:
+						frontera = Sprite::create("Fd.png");
+						break;
+					}
+					if (i%2 == 0){
+						frontera->setPosition(Point((i*14)+14, visibleSize.height-(j*18)-18));
+					}
+					else {
+						frontera->setPosition(Point((i*14)+14, visibleSize.height-(j*18)-27));
+					}
+					addChild(frontera, 2);
+				}
+			}
 			if (auxIdProvincia != 0){
 				switch (miTablero->listaProvincias[auxIdProvincia]->getPerteneceIdJugador()){
 				case 0:
@@ -354,10 +380,9 @@ void GameScene::Redibujar() {
 					break;
 				}
 				if (!miTablero->listaProvincias[auxIdProvincia]->getVisible()){
-					_backgroundArray[i][j]->setOpacity(200);
-				}
-				else {
-					_backgroundArray[i][j]->setOpacity(255);
+					color.r /= 1.5;
+					color.g /= 1.5;
+					color.b /= 1.5;
 				}
 			}
 			else {

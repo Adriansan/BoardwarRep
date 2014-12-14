@@ -50,6 +50,9 @@ void Tablero::GenerarMapa()
 		for (i = 0; i<largo; i++){
 			for (j = 0; j<largo; j++){
 				matrizMapa[i][j] = 0;
+				matrizMapaFrontera[i][j][0] = false;
+				matrizMapaFrontera[i][j][1] = false;
+				matrizMapaFrontera[i][j][2] = false;
 			}
 		}
 
@@ -126,11 +129,32 @@ void Tablero::GenerarMapa()
 		for (i = 0; i<largo; i++){
 				for (j = 0; j<largo; j++){
 					if (i-1 >= 0){
-						if (direcciones[matrizMapa[i][j]][matrizMapa[i-1][j]] == false){
-							direcciones[matrizMapa[i][j]][matrizMapa[i-1][j]] = true;
+						if (i%2 == 0){
+							if (matrizMapa[i][j] != matrizMapa[i-1][j]){
+								matrizMapaFrontera[i][j][0] = true;
+							}
+						}
+						else {
+							if (j+1 < largo){
+								if (matrizMapa[i][j] != matrizMapa[i-1][j+1]){
+									matrizMapaFrontera[i][j][0] = true;
+								}
+							}
 						}
 					}
 					if (i+1 < largo){
+						if (i%2 == 0){
+							if (matrizMapa[i][j] != matrizMapa[i+1][j]){
+								matrizMapaFrontera[i][j][2] = true;
+							}
+						}
+						else {
+							if (j+1 < largo){
+								if (matrizMapa[i][j] != matrizMapa[i+1][j+1]){
+									matrizMapaFrontera[i][j][2] = true;
+								}
+							}
+						}
 						if (direcciones[matrizMapa[i][j]][matrizMapa[i+1][j]] == false){
 							direcciones[matrizMapa[i][j]][matrizMapa[i+1][j]] = true;
 						}
@@ -141,6 +165,9 @@ void Tablero::GenerarMapa()
 						}
 					}
 					if (j+1 < largo){
+						if(matrizMapa[i][j] != matrizMapa[i][j+1]){
+							matrizMapaFrontera[i][j][1] = true;
+						}
 						if (direcciones[matrizMapa[i][j]][matrizMapa[i][j+1]] == false){
 							direcciones[matrizMapa[i][j]][matrizMapa[i][j+1]] = true;
 						}

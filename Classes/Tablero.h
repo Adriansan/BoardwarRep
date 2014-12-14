@@ -16,6 +16,7 @@ private:
 public:
 	Provincia* listaProvincias[numeros];
 	int matrizMapa[largo][largo];
+	bool matrizMapaFrontera[largo][largo][3];
 	Tablero(int Jugadores);
 	~Tablero(void);
 	void SalirPartida(void);
