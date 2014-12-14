@@ -41,7 +41,7 @@ public:
     
     // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
-	void goToMainMenu(Ref *pSender);	void VolverAEscoger(Ref *pSender);	void EmpezarPartida(Ref *pSender);	void InicioJuego();	void CambiarTurnoJuego();	void CambiarTurnoUsuario(Ref *pSender);	void AsignacionLegiones();	void AtacarProvincia(int idProvinciaOrigen, int idProvinciaDestino);	void MostrarProvincia(int idProvincia);	void update(float dt);	void Redibujar();
+	void goToMainMenu(Ref *pSender);	void VolverAEscoger(Ref *pSender);	void EmpezarPartida(Ref *pSender);	void InicioJuego();	void AsignarVisibilidadInicio();	void CambiarTurnoJuego();	void CambiarTurnoUsuario(Ref *pSender);	void AsignacionLegiones();	void AtacarProvincia(int idProvinciaOrigen, int idProvinciaDestino);	void ReasignarProvinciasVisibles();	void MostrarProvincia(int idProvincia);	void update(float dt);	void Redibujar();
 	void ClickRaton(Event *event);
 	void AccionesIA();
 	bool DeteccionFin();

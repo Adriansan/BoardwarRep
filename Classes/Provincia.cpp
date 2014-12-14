@@ -5,6 +5,7 @@ Provincia::Provincia(int auxId)
 {
 	escogida = false;
 	id = auxId;
+	visible = false;
 	int auxrand = (rand() % cantidadtipos);
 	switch (auxrand){
 		case 0:
@@ -91,4 +92,12 @@ void Provincia::setPerteneceIdJugador(int idJugador){
 
 Material* Provincia::getMaterial(){
 	return recurso;
+}
+
+void Provincia::setVisible(bool auxVisible){
+	visible = auxVisible;
+}
+
+bool Provincia::getVisible(){
+	return visible;
 }

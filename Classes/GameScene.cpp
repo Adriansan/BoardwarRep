@@ -80,7 +80,21 @@ void GameScene::VolverAEscoger(Ref *pSender) {
 
 void GameScene::EmpezarPartida(Ref *pSender) {
 	enPartida = true;
+	AsignarVisibilidadInicio();
 	Redibujar();
+}
+
+void GameScene::AsignarVisibilidadInicio(){
+	list<int>::iterator provincia;
+	list<int>::iterator provinciaColindante;
+	int idProvincia = 0;
+	for (provincia = Jugadores[idJugadorUsuario]->propiedadProvincias.begin(); provincia != Jugadores[idJugadorUsuario]->propiedadProvincias.end(); provincia++){
+		idProvincia = *provincia;
+		miTablero->listaProvincias[idProvincia]->setVisible(true);
+		for (provinciaColindante = miTablero->listaProvincias[idProvincia]->provinciasColindantes.begin(); provinciaColindante != miTablero->listaProvincias[idProvincia]->provinciasColindantes.end(); ++provinciaColindante){
+			miTablero->listaProvincias[*provinciaColindante]->setVisible(true);
+		}
+	}
 }
 
 void GameScene::update(float dt){
@@ -147,7 +161,6 @@ void GameScene::AccionesIA(){
 			}
 			if (idProvinciaAtacable != 0){
 				AtacarProvincia(idProvincia, idProvinciaAtacable);
-				Redibujar();
 				return;
 			}
 		}
@@ -180,6 +193,14 @@ void GameScene::AsignacionLegiones(){
 		}
 	}
 }
+
+void GameScene::ReasignarProvinciasVisibles(){
+	for (int i = 1; i<numeros-1; i++){
+		miTablero->listaProvincias[i]->setVisible(false);
+	}
+	AsignarVisibilidadInicio();
+}
+
 void GameScene::AtacarProvincia(int idProvinciaOrigen, int idProvinciaDestino){
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	idAntiguaSeleccionada = 0;
@@ -215,6 +236,12 @@ void GameScene::AtacarProvincia(int idProvinciaOrigen, int idProvinciaDestino){
 			miTablero->listaProvincias[idProvinciaOrigen]->setLegiones(1);
 			miTablero->listaProvincias[idProvinciaDestino]->setLegiones(legionesrestantes);
 			text = __String::createWithFormat("El atacante %d gana a la defensa %d con un resultado de %d a %d", jugadoratacante, jugadordefensor, dañoataque, dañodefensa);
+			if (jugadoratacante == idJugadorUsuario){
+				ReasignarProvinciasVisibles();
+			}
+			if (jugadordefensor == idJugadorUsuario){
+				ReasignarProvinciasVisibles();
+			}
 		}
 		else {
 			miTablero->listaProvincias[idProvinciaOrigen]->setLegiones(1);
@@ -301,33 +328,42 @@ void GameScene::MostrarProvincia(int idProvincia){
 void GameScene::Redibujar() {
 	removeAllChildren();
 	Size visibleSize = Director::getInstance()->getVisibleSize();
+	cocos2d::Color3B color;
 	int i;
 	int j;
 	for (i = 0; i<largo; i++){
 		for (j = 0; j<largo; j++){
+			_backgroundArray[i][j] = Sprite::create("hexagono.png");
 			int auxIdProvincia = miTablero->matrizMapa[i][j];
 			if (auxIdProvincia != 0){
 				switch (miTablero->listaProvincias[auxIdProvincia]->getPerteneceIdJugador()){
 				case 0:
-					_backgroundArray[i][j] = Sprite::create("hexagonoORANGE.png");
+					color = Color3B(255,104,0);
 					break;
 
 				case 1:
-					_backgroundArray[i][j] = Sprite::create("hexagonoAPPLE.png");
+					color = Color3B(199,255,0);
 					break;
 
 				case 2:
-					_backgroundArray[i][j] = Sprite::create("hexagonoRED.png");
+					color = Color3B(255,0,0);
 					break;
 
 				case 3:
-					_backgroundArray[i][j] = Sprite::create("hexagono.png");
+					color = Color3B(255,255,255);
 					break;
+				}
+				if (!miTablero->listaProvincias[auxIdProvincia]->getVisible()){
+					_backgroundArray[i][j]->setOpacity(200);
+				}
+				else {
+					_backgroundArray[i][j]->setOpacity(255);
 				}
 			}
 			else {
-				_backgroundArray[i][j] = Sprite::create("hexagonoBLUE.png");
+				color = Color3B(0,0,255);
 			}
+			_backgroundArray[i][j]->setColor(color);
 			if (i%2 == 0){
 				_backgroundArray[i][j]->setPosition(Point((i*14)+14, visibleSize.height-(j*18)-18));
 			}
@@ -344,17 +380,18 @@ void GameScene::Redibujar() {
 	int auxX;
 	int auxY;
 	for (i = 1; i<numeros; i++){
-		text = __String::createWithFormat("%d", miTablero->listaProvincias[i]->getLegiones());
-		_etiquetasSoldados[i] =  LabelTTF::create(text->getCString(), "Arial", 20);
-		auxX = miTablero->listaProvincias[i]->getCentroProvinciax();
-		auxY = miTablero->listaProvincias[i]->getCentroProvinciay();
-		if (i%2 == 0){
-			_etiquetasSoldados[i]->setPosition(Vec2((auxX*14)+14, visibleSize.height-(auxY*18)-18));
-		}
-		else {
-			_etiquetasSoldados[i]->setPosition(Vec2((auxX*14)+14, visibleSize.height-(auxY*18)-27));
-		}
-		_etiquetasSoldados[i]->setColor(ccc3(0,0,0));		addChild(_etiquetasSoldados[i], 1);	}
+		if (miTablero->listaProvincias[i]->getVisible()){
+			text = __String::createWithFormat("%d", miTablero->listaProvincias[i]->getLegiones());
+			_etiquetasSoldados[i] =  LabelTTF::create(text->getCString(), "Arial", 20);
+			auxX = miTablero->listaProvincias[i]->getCentroProvinciax();
+			auxY = miTablero->listaProvincias[i]->getCentroProvinciay();
+			if (i%2 == 0){
+				_etiquetasSoldados[i]->setPosition(Vec2((auxX*14)+14, visibleSize.height-(auxY*18)-18));
+			}
+			else {
+				_etiquetasSoldados[i]->setPosition(Vec2((auxX*14)+14, visibleSize.height-(auxY*18)-27));
+			}
+			_etiquetasSoldados[i]->setColor(ccc3(0,0,0));			addChild(_etiquetasSoldados[i], 1);		}	}
 
 	auto playItem = MenuItemImage::create("Play_Button.png", "Play_Button(Click).png", CC_CALLBACK_1(GameScene::CambiarTurnoUsuario, this));
 	botonFinTurno = Menu::create(playItem, NULL);

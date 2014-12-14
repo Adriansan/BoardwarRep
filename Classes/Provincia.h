@@ -14,6 +14,7 @@ private:
 	// Jugador propiedadJugador;
 	Material* recurso;
 	bool escogida;
+	bool visible;
 	int centroProvincia[2];
 	int perteneceIdJugador;
 public:
@@ -31,6 +32,8 @@ public:
 	void setCentroProvincia(int auxCentro[2]);
 	int getLegiones(void);
 	void setLegiones(int auxLegiones);
+	bool getVisible(void);
+	void setVisible(bool auxVisible);
 	Material* getMaterial();
 	Provincia(int auxId);
 	~Provincia(void);
