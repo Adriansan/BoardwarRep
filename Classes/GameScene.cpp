@@ -31,6 +31,7 @@ bool GameScene::init()
 	botonFinTurno = Menu::create(playItem, NULL);
 	botonFinTurno->setPosition(950, visibleSize.height-600);
 
+	numJugadores = 2;
 	InicioJuego();
 
 	enPartida = false;
@@ -49,6 +50,12 @@ bool GameScene::init()
 	idProvinciaSeleccionada = 0;
 	idAntiguaSeleccionada = idProvinciaSeleccionada;
 
+	MostrarOpcionesInicio();
+    return true;
+}
+
+void GameScene::MostrarOpcionesInicio(){
+	Size visibleSize = Director::getInstance()->getVisibleSize();
 	__String *text;
 	auto Afirmativo = MenuItemImage::create("Play_Button.png", "Play_Button(Click).png", CC_CALLBACK_1(GameScene::EmpezarPartida, this));
 	auto Negativo = MenuItemImage::create("Play_Button.png", "Play_Button(Click).png", CC_CALLBACK_1(GameScene::VolverAEscoger, this));
@@ -57,12 +64,22 @@ bool GameScene::init()
 	botonEscogerMapa->alignItemsHorizontallyWithPadding(100);
 	addChild(botonEscogerMapa);
 
+	auto Más = MenuItemImage::create("Play_Button.png", "Play_Button(Click).png", CC_CALLBACK_1(GameScene::MoverNumeroJugadores, this));
+	auto Menos = MenuItemImage::create("Play_Button.png", "Play_Button(Click).png", CC_CALLBACK_1(GameScene::MoverNumeroJugadores2, this));
+	Menu* botonEscogerJugadores = Menu::create(Menos, Más, NULL);
+	botonEscogerJugadores->setPosition(950, visibleSize.height-200);
+	botonEscogerJugadores->alignItemsHorizontallyWithPadding(100);
+	addChild(botonEscogerJugadores);
+
 	text = __String::createWithFormat("¿Deseas coger este mapa?");
 	LabelTTF* EscogerMapa = LabelTTF::create(text->getCString(), "Arial", 20);	EscogerMapa->setPosition(Vec2(950, visibleSize.height-500));
 	EscogerMapa->setColor(ccc3(255,255,255));
 	addChild(EscogerMapa);
 
-    return true;
+	text = __String::createWithFormat("Numero Jugadores: %d", numJugadores);
+	LabelTTF* NumJugadoresLabel = LabelTTF::create(text->getCString(), "Arial", 20);	NumJugadoresLabel->setPosition(Vec2(950, visibleSize.height-150));
+	NumJugadoresLabel->setColor(ccc3(255,255,255));
+	addChild(NumJugadoresLabel);
 }
 
 void GameScene::goToMainMenu(Ref *pSender) {
@@ -71,11 +88,26 @@ void GameScene::goToMainMenu(Ref *pSender) {
 	 Director::getInstance()->replaceScene(scene);
 }
 
+void GameScene::MoverNumeroJugadores(Ref *pSender) {
+	if (numJugadores != 8){
+		numJugadores += 1;
+		removeAllChildren();
+		InicioJuego();
+		MostrarOpcionesInicio();
+	}
+}
+
+void GameScene::MoverNumeroJugadores2(Ref *pSender) {
+	if (numJugadores != 2){
+		numJugadores -= 1;
+		InicioJuego();
+		MostrarOpcionesInicio();
+	}
+}
 
 void GameScene::VolverAEscoger(Ref *pSender) {
-	auto scene = GameScene::createScene();
-
-	Director::getInstance()->replaceScene(scene);
+	InicioJuego();
+	MostrarOpcionesInicio();
 }
 
 void GameScene::EmpezarPartida(Ref *pSender) {
@@ -170,7 +202,7 @@ void GameScene::AccionesIA(){
 }
 void GameScene::AsignacionLegiones(){
 	int cantidad = 0;
-	int cantidadmaxima = Jugadores[turnojugador]->propiedadProvincias.size();
+	int cantidadmaxima = GenerarLegiones();
 	int idProvinciaAsignacion = 0;
 	int legionesProvincia = 0;
 	bool llenas = false;
@@ -194,6 +226,31 @@ void GameScene::AsignacionLegiones(){
 	}
 }
 
+int GameScene::GenerarLegiones(){
+	int legionesGeneradas = Jugadores[turnojugador]->propiedadProvincias.size();
+	int cantidadMateriales[cantidadtipos];
+	int idProvincia;
+	int i;
+	int auxCantidad;
+	int tamaño = cantidadtipos;
+	for (i = 0; i<tamaño; i++){
+		cantidadMateriales[i] = 0;
+	}
+
+	list<int>::iterator posicion;
+	for (posicion = Jugadores[turnojugador]->propiedadProvincias.begin(); posicion != Jugadores[turnojugador]->propiedadProvincias.end(); ++posicion){
+		idProvincia = *posicion;
+		Material* auxMaterial = miTablero->listaProvincias[idProvincia]->getMaterial();
+		cantidadMateriales[auxMaterial->getTipo()-1] += 1;
+	}
+
+	for (i = 0; i<tamaño; i++){
+		auxCantidad = cantidadMateriales[i];
+		legionesGeneradas += ((auxCantidad / 3) * 3);
+	}
+
+	return legionesGeneradas;
+}
 void GameScene::ReasignarProvinciasVisibles(){
 	for (int i = 1; i<numeros-1; i++){
 		miTablero->listaProvincias[i]->setVisible(false);
@@ -235,7 +292,7 @@ void GameScene::AtacarProvincia(int idProvinciaOrigen, int idProvinciaDestino){
 			Jugadores[jugadoratacante]->AñadirProvincia(idProvinciaDestino);
 			miTablero->listaProvincias[idProvinciaOrigen]->setLegiones(1);
 			miTablero->listaProvincias[idProvinciaDestino]->setLegiones(legionesrestantes);
-			text = __String::createWithFormat("El atacante %d gana a la defensa %d con un resultado de %d a %d", jugadoratacante, jugadordefensor, dañoataque, dañodefensa);
+			text = __String::createWithFormat("El atacante %d gana a la defensa %d\ncon un resultado de %d a %d", jugadoratacante, jugadordefensor, dañoataque, dañodefensa);
 			if (jugadoratacante == idJugadorUsuario){
 				ReasignarProvinciasVisibles();
 			}
@@ -245,7 +302,7 @@ void GameScene::AtacarProvincia(int idProvinciaOrigen, int idProvinciaDestino){
 		}
 		else {
 			miTablero->listaProvincias[idProvinciaOrigen]->setLegiones(1);
-			text = __String::createWithFormat("El defensor %d gana al ataque %d con un resultado de %d a %d", jugadordefensor, jugadoratacante, dañodefensa, dañoataque);
+			text = __String::createWithFormat("El defensor %d gana al ataque %d\ncon un resultado de %d a %d", jugadordefensor, jugadoratacante, dañodefensa, dañoataque);
 		}
 	}
 	LabelTTF* prueba =  LabelTTF::create(text->getCString(), "Arial", 20);
@@ -269,7 +326,7 @@ void GameScene::InicioJuego(){
 
 	int idProvincia;
 	for (i = 0; i<numJugadores; i++){
-		for (j = 0; j<(numeros/numJugadores); j++){
+		for (j = 0; j<((numeros-1)/numJugadores); j++){
 			idProvincia = miTablero->AsignarProvincia();
 			Jugadores[i]->AñadirProvincia(idProvincia);
 			miTablero->listaProvincias[idProvincia]->setPerteneceIdJugador(i);
@@ -284,11 +341,21 @@ void GameScene::InicioJuego(){
 			Jugadores[i]->AñadirProvincia(idProvincia);
 			miTablero->listaProvincias[idProvincia]->setPerteneceIdJugador(i);
 		}
+		Jugadores[i]->CambiarTurno();
+		turnojugador = i;
+		idJugadorUsuario = i;
 	}
-
-	Jugadores[i]->CambiarTurno();
-	turnojugador = i;
-	idJugadorUsuario = i;
+	else {
+		for (i = 1; i<numeros; i++){
+			if (miTablero->listaProvincias[i]->getPerteneceIdJugador() == -1){
+				Jugadores[0]->AñadirProvincia(i);
+				miTablero->listaProvincias[i]->setPerteneceIdJugador(0);
+			}
+		}
+		Jugadores[1]->CambiarTurno();
+		turnojugador = 1;
+		idJugadorUsuario = 1;
+	}
 	Redibujar();
 }
 
@@ -368,7 +435,7 @@ void GameScene::Redibujar() {
 					break;
 
 				case 1:
-					color = Color3B(199,255,0);
+					color = Color3B(255,255,0);
 					break;
 
 				case 2:
@@ -377,6 +444,22 @@ void GameScene::Redibujar() {
 
 				case 3:
 					color = Color3B(255,255,255);
+					break;
+
+				case 4:
+					color = Color3B(199,0,255);
+					break;
+
+				case 5:
+					color = Color3B(150,255,27);
+					break;
+
+				case 6:
+					color = Color3B(0,199,255);
+					break;
+
+				case 7:
+					color = Color3B(150,0,255);
 					break;
 				}
 				if (!miTablero->listaProvincias[auxIdProvincia]->getVisible()){

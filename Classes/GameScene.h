@@ -8,15 +8,16 @@
 
 using namespace std;
 
-const int numJugadores = 4;
-
+const int numJugadoresMaximos = 8;
 USING_NS_CC;
 
 class GameScene : public cocos2d::Layer
 {
 private:
+	int numJugadores;
 	float tiempopartida;
 	int turnojugador;
+	bool numJugMas;
 	bool pasado;
 	bool enPartida;
 	LabelTTF* _etiquetasSoldados[numeros];
@@ -25,7 +26,7 @@ private:
 	Sprite* _backgroundArray[largo][largo];
 	Menu* botonFinTurno;
 	Tablero* miTablero;
-	Jugador* Jugadores[numJugadores];
+	Jugador* Jugadores[numJugadoresMaximos];
 	int posRaton[2];
 	int posAntiguaRaton[2];
 	int idJugadorUsuario;
@@ -41,7 +42,7 @@ public:
     
     // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
-	void goToMainMenu(Ref *pSender);	void VolverAEscoger(Ref *pSender);	void EmpezarPartida(Ref *pSender);	void InicioJuego();	void AsignarVisibilidadInicio();	void CambiarTurnoJuego();	void CambiarTurnoUsuario(Ref *pSender);	void AsignacionLegiones();	void AtacarProvincia(int idProvinciaOrigen, int idProvinciaDestino);	void ReasignarProvinciasVisibles();	void MostrarProvincia(int idProvincia);	void update(float dt);	void Redibujar();
+	void goToMainMenu(Ref *pSender);	void VolverAEscoger(Ref *pSender);	void EmpezarPartida(Ref *pSender);	void MostrarOpcionesInicio();	void MoverNumeroJugadores(Ref *pSender);	void MoverNumeroJugadores2(Ref *pSender);	void InicioJuego();	void AsignarVisibilidadInicio();	void CambiarTurnoJuego();	void CambiarTurnoUsuario(Ref *pSender);	void AsignacionLegiones();	int  GenerarLegiones();	void AtacarProvincia(int idProvinciaOrigen, int idProvinciaDestino);	void ReasignarProvinciasVisibles();	void MostrarProvincia(int idProvincia);	void update(float dt);	void Redibujar();
 	void ClickRaton(Event *event);
 	void AccionesIA();
 	bool DeteccionFin();

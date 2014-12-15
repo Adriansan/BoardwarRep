@@ -14,7 +14,6 @@ public:
 	void CambiarTurno();
 	bool ConsultarProvincia(int provinciaId);
 	void EliminarProvincia(int provinciaId);
-
 	Jugador(int auxId);
 	~Jugador(void);
 };

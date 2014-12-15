@@ -7,6 +7,7 @@ Provincia::Provincia(int auxId)
 	id = auxId;
 	visible = false;
 	int auxrand = (rand() % cantidadtipos);
+	perteneceIdJugador = -1;
 	switch (auxrand){
 		case 0:
 			recurso = new Material(oro);
