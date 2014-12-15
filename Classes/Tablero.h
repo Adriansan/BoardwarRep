@@ -15,6 +15,7 @@ private:
 
 public:
 	Provincia* listaProvincias[numeros];
+	bool listaProvinciasEspiadas[numeros];
 	int matrizMapa[largo][largo];
 	bool matrizMapaFrontera[largo][largo][3];
 	Tablero(int Jugadores);
@@ -24,4 +25,5 @@ public:
 	int AsignarProvincia();
 	void AsignarCentroProvincias(int idProvincia);
 	void AsignarLegionesInicio();
+	void ReasignarVisibilidadEspía();
 };

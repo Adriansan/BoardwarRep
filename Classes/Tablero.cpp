@@ -7,6 +7,7 @@ Tablero::Tablero(int Jugadores)
 	srand(time(NULL));
 	for (int i = 0; i<numeros; i++){
 		listaProvincias[i] = new Provincia(i);
+		listaProvinciasEspiadas[i] = false;
 	}
 }
 
@@ -26,6 +27,12 @@ int Tablero::AsignarProvincia(){
 			listaProvincias[auxrand]->setEscogida(true);
 			return auxrand;
 		}
+	}
+}
+
+void Tablero::ReasignarVisibilidadEspía(){
+	for (int i = 1; i<numeros; i++){
+		listaProvinciasEspiadas[i] = false;
 	}
 }
 

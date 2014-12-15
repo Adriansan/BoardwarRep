@@ -32,6 +32,7 @@ bool GameScene::init()
 	botonFinTurno->setPosition(950, visibleSize.height-600);
 
 	numJugadores = 2;
+	modoEspía = false;
 	InicioJuego();
 
 	enPartida = false;
@@ -136,7 +137,12 @@ void GameScene::update(float dt){
 			if (posAntiguaRaton[0] != posRaton[0] || posAntiguaRaton[1] != posRaton[1]){
 				if (idProvinciaSeleccionada != 0){
 					if (idAntiguaSeleccionada != 0){
-						AtacarProvincia(idAntiguaSeleccionada, idProvinciaSeleccionada);
+						if (!modoEspía){
+							AtacarProvincia(idAntiguaSeleccionada, idProvinciaSeleccionada);
+						}
+						else {
+							EspiarProvincia(idAntiguaSeleccionada, idProvinciaSeleccionada);
+						}
 					}
 				}
 			}
@@ -155,6 +161,7 @@ void GameScene::CambiarTurnoUsuario(Ref *pSender){
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	if (turnojugador == idJugadorUsuario){
 		tiempopartida = 0;
+		miTablero->ReasignarVisibilidadEspía();
 		CambiarTurnoJuego();
 	}
 }
@@ -258,6 +265,50 @@ void GameScene::ReasignarProvinciasVisibles(){
 	AsignarVisibilidadInicio();
 }
 
+void GameScene::CambiarModoEspía(Ref *pSender){
+	__String *text;
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	removeChildByName("ModoEspía");
+	if(modoEspía) {
+		modoEspía = false;
+		text = __String::createWithFormat("Modo Espía OFF");
+	}
+	else { 
+		modoEspía = true;
+		text = __String::createWithFormat("Modo Espía ON");
+	}
+	modoEspíaLabel = LabelTTF::create(text->getCString(), "Arial", 20);	modoEspíaLabel->setPosition(Vec2(1100, visibleSize.height-950));
+	modoEspíaLabel->setColor(ccc3(255,255,255));
+	modoEspíaLabel->setName("ModoEspía");
+	addChild(modoEspíaLabel);
+}
+
+void GameScene::EspiarProvincia(int idProvinciaOrigen, int idProvinciaDestino){
+	__String *text;
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	if (miTablero->listaProvincias[idProvinciaOrigen]->getLegiones() == 1){
+		text = __String::createWithFormat("Solo 1 Legión en la provincia.");
+	}
+	else if (miTablero->listaProvincias[idProvinciaOrigen]->getPerteneceIdJugador() == miTablero->listaProvincias[idProvinciaDestino]->getPerteneceIdJugador()){
+		text = __String::createWithFormat("No pueden ser del mismo jugador.");
+	}
+	else if(miTablero->listaProvincias[idProvinciaDestino]->getVisible() || miTablero->listaProvinciasEspiadas[idProvinciaDestino]){
+		text = __String::createWithFormat("La provincia %d ya es visible.", idProvinciaDestino);
+	}
+	else {
+		text = __String::createWithFormat("Provincia %d espíada con éxito.", idProvinciaDestino);
+		miTablero->listaProvincias[idProvinciaOrigen]->setLegiones(miTablero->listaProvincias[idProvinciaOrigen]->getLegiones()-1);
+		miTablero->listaProvinciasEspiadas[idProvinciaDestino] = true;
+	}
+	LabelTTF* Excepciones =  LabelTTF::create(text->getCString(), "Arial", 20);
+	Excepciones->setPosition(Vec2(950, visibleSize.height-200));
+	Excepciones->setColor(ccc3(255,255,255));	posRaton[0] = 0;
+	posRaton[1] = 1;
+	posAntiguaRaton[0] = posRaton[0];
+	posAntiguaRaton[1] = posRaton[1];
+	idProvinciaSeleccionada = 0;
+	idAntiguaSeleccionada = idProvinciaSeleccionada;	Redibujar();	addChild(Excepciones, 1);
+}
 void GameScene::AtacarProvincia(int idProvinciaOrigen, int idProvinciaDestino){
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	idAntiguaSeleccionada = 0;
@@ -462,7 +513,7 @@ void GameScene::Redibujar() {
 					color = Color3B(150,0,255);
 					break;
 				}
-				if (!miTablero->listaProvincias[auxIdProvincia]->getVisible()){
+				if (!miTablero->listaProvincias[auxIdProvincia]->getVisible() && !miTablero->listaProvinciasEspiadas[auxIdProvincia]){
 					color.r /= 1.5;
 					color.g /= 1.5;
 					color.b /= 1.5;
@@ -488,7 +539,7 @@ void GameScene::Redibujar() {
 	int auxX;
 	int auxY;
 	for (i = 1; i<numeros; i++){
-		if (miTablero->listaProvincias[i]->getVisible()){
+		if (miTablero->listaProvincias[i]->getVisible() || miTablero->listaProvinciasEspiadas[i]){
 			text = __String::createWithFormat("%d", miTablero->listaProvincias[i]->getLegiones());
 			_etiquetasSoldados[i] =  LabelTTF::create(text->getCString(), "Arial", 20);
 			auxX = miTablero->listaProvincias[i]->getCentroProvinciax();
@@ -501,16 +552,31 @@ void GameScene::Redibujar() {
 			}
 			_etiquetasSoldados[i]->setColor(ccc3(0,0,0));			addChild(_etiquetasSoldados[i], 1);		}	}
 
-	auto playItem = MenuItemImage::create("Play_Button.png", "Play_Button(Click).png", CC_CALLBACK_1(GameScene::CambiarTurnoUsuario, this));
-	botonFinTurno = Menu::create(playItem, NULL);
-	botonFinTurno->setPosition(950, visibleSize.height-800);
-	addChild(botonFinTurno);
+	if(enPartida){
+		auto playItem = MenuItemImage::create("Play_Button.png", "Play_Button(Click).png", CC_CALLBACK_1(GameScene::CambiarTurnoUsuario, this));
+		botonFinTurno = Menu::create(playItem, NULL);
+		botonFinTurno->setPosition(950, visibleSize.height-800);
+		addChild(botonFinTurno);
 
-	text = __String::createWithFormat("Turnojugador: %d \nUsuario: %d", turnojugador, idJugadorUsuario);
-	turno = LabelTTF::create(text->getCString(), "Arial", 20);	turno->setPosition(Vec2(950, visibleSize.height-850));
-	turno->setColor(ccc3(255,255,255));
-	turno->setName("turno");
-	addChild(turno);
+		text = __String::createWithFormat("Turnojugador: %d \nUsuario: %d", turnojugador, idJugadorUsuario);
+		turno = LabelTTF::create(text->getCString(), "Arial", 20);		turno->setPosition(Vec2(950, visibleSize.height-850));
+		turno->setColor(ccc3(255,255,255));
+		turno->setName("turno");
+		addChild(turno);
+
+		if (modoEspía){ text = __String::createWithFormat("Modo Espía ON"); }
+		else { text = __String::createWithFormat("Modo Espía OFF"); }
+		modoEspíaLabel = LabelTTF::create(text->getCString(), "Arial", 20);		modoEspíaLabel->setPosition(Vec2(1100, visibleSize.height-950));
+		modoEspíaLabel->setColor(ccc3(255,255,255));
+		modoEspíaLabel->setName("ModoEspía");
+		addChild(modoEspíaLabel);
+
+		auto Espía = MenuItemImage::create("Play_Button.png", "Play_Button(Click).png", CC_CALLBACK_1(GameScene::CambiarModoEspía, this));
+		Menu* botonEspía = Menu::create(Espía, NULL);
+		botonEspía->setPosition(1100, visibleSize.height-1000);
+		botonEspía->alignItemsHorizontallyWithPadding(100);
+		addChild(botonEspía);
+	}
 }
 
 void GameScene::ClickRaton(Event *event){
