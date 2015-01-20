@@ -271,11 +271,11 @@ void GameScene::CambiarModoEspía(Ref *pSender){
 	removeChildByName("ModoEspía");
 	if(modoEspía) {
 		modoEspía = false;
-		text = __String::createWithFormat("Modo Espía OFF");
+		text = __String::createWithFormat("Modo Espia OFF");
 	}
 	else { 
 		modoEspía = true;
-		text = __String::createWithFormat("Modo Espía ON");
+		text = __String::createWithFormat("Modo Espia ON");
 	}
 	modoEspíaLabel = LabelTTF::create(text->getCString(), "Arial", 20);	modoEspíaLabel->setPosition(Vec2(1100, visibleSize.height-950));
 	modoEspíaLabel->setColor(ccc3(255,255,255));
@@ -538,19 +538,74 @@ void GameScene::Redibujar() {
 	__String *text;
 	int auxX;
 	int auxY;
+	Sprite* soldado;
+	Sprite* soldadoFondo;
 	for (i = 1; i<numeros; i++){
 		if (miTablero->listaProvincias[i]->getVisible() || miTablero->listaProvinciasEspiadas[i]){
 			text = __String::createWithFormat("%d", miTablero->listaProvincias[i]->getLegiones());
 			_etiquetasSoldados[i] =  LabelTTF::create(text->getCString(), "Arial", 20);
 			auxX = miTablero->listaProvincias[i]->getCentroProvinciax();
 			auxY = miTablero->listaProvincias[i]->getCentroProvinciay();
+			int auxIdProvincia = i;
+			soldado = Sprite::create("SoldierT.png");
+			soldadoFondo = Sprite::create("SoldierWhite.png");
 			if (i%2 == 0){
 				_etiquetasSoldados[i]->setPosition(Vec2((auxX*14)+14, visibleSize.height-(auxY*18)-18));
+				soldado->setPosition(Vec2((auxX * 14) + 14, visibleSize.height - (auxY * 18) - 18));
+				soldadoFondo->setPosition(Vec2((auxX * 14) + 14, visibleSize.height - (auxY * 18) - 18));
 			}
 			else {
 				_etiquetasSoldados[i]->setPosition(Vec2((auxX*14)+14, visibleSize.height-(auxY*18)-27));
+				soldado->setPosition(Vec2((auxX * 14) + 14, visibleSize.height - (auxY * 18) - 27));
+				soldadoFondo->setPosition(Vec2((auxX * 14) + 14, visibleSize.height - (auxY * 18) - 27));
 			}
-			_etiquetasSoldados[i]->setColor(ccc3(0,0,0));			addChild(_etiquetasSoldados[i], 1);		}	}
+			//______________________________________________
+			if (auxIdProvincia != 0){
+				switch (miTablero->listaProvincias[auxIdProvincia]->getPerteneceIdJugador()){
+				case 0:
+					color = Color3B(255, 104, 0);
+					break;
+
+				case 1:
+					color = Color3B(255, 255, 0);
+					break;
+
+				case 2:
+					color = Color3B(255, 0, 0);
+					break;
+
+				case 3:
+					color = Color3B(255, 255, 255);
+					break;
+
+				case 4:
+					color = Color3B(199, 0, 255);
+					break;
+
+				case 5:
+					color = Color3B(150, 255, 27);
+					break;
+
+				case 6:
+					color = Color3B(0, 199, 255);
+					break;
+
+				case 7:
+					color = Color3B(150, 0, 255);
+					break;
+				}
+				if (!miTablero->listaProvincias[auxIdProvincia]->getVisible() && !miTablero->listaProvinciasEspiadas[auxIdProvincia]){
+					color.r /= 1.5;
+					color.g /= 1.5;
+					color.b /= 1.5;
+				}
+			}
+			else {
+				color = Color3B(0, 0, 255);
+			}
+			soldadoFondo->setColor(color);
+			//______________________________________________
+			_etiquetasSoldados[i]->setColor(ccc3(0,0,0));			addChild(soldadoFondo, 3);			addChild(soldado, 4);			addChild(_etiquetasSoldados[i], 5);					}	}
 
 	if(enPartida){
 		auto playItem = MenuItemImage::create("Play_Button.png", "Play_Button(Click).png", CC_CALLBACK_1(GameScene::CambiarTurnoUsuario, this));
@@ -564,8 +619,8 @@ void GameScene::Redibujar() {
 		turno->setName("turno");
 		addChild(turno);
 
-		if (modoEspía){ text = __String::createWithFormat("Modo Espía ON"); }
-		else { text = __String::createWithFormat("Modo Espía OFF"); }
+		if (modoEspía){ text = __String::createWithFormat("Modo Espia ON"); }
+		else { text = __String::createWithFormat("Modo Espia OFF"); }
 		modoEspíaLabel = LabelTTF::create(text->getCString(), "Arial", 20);		modoEspíaLabel->setPosition(Vec2(1100, visibleSize.height-950));
 		modoEspíaLabel->setColor(ccc3(255,255,255));
 		modoEspíaLabel->setName("ModoEspía");

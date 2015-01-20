@@ -137,70 +137,81 @@ void Tablero::GenerarMapa()
 				for (j = 0; j<largo; j++){
 					if (i-1 >= 0){
 						if (i%2 == 0){
+							// Abajo Izquierda
 							if (matrizMapa[i][j] != matrizMapa[i-1][j]){
 								matrizMapaFrontera[i][j][0] = true;
 							}
+							if (direcciones[matrizMapa[i][j]][matrizMapa[i-1][j]] == false){
+								direcciones[matrizMapa[i][j]][matrizMapa[i-1][j]] = true;
+							}
+							// Arriba Izquierda
+							if (j-1 >= 0){
+								if (direcciones[matrizMapa[i][j]][matrizMapa[i-1][j-1]] == false){
+									direcciones[matrizMapa[i][j]][matrizMapa[i-1][j-1]] = true;
+								}
+							}
 						}
 						else {
+							// Abajo Izquierda
 							if (j+1 < largo){
 								if (matrizMapa[i][j] != matrizMapa[i-1][j+1]){
 									matrizMapaFrontera[i][j][0] = true;
 								}
+								if (direcciones[matrizMapa[i][j]][matrizMapa[i-1][j+1]] == false){
+									direcciones[matrizMapa[i][j]][matrizMapa[i-1][j+1]] = true;
+								}
+							}
+							// Arriba Izquierda
+							if (direcciones[matrizMapa[i][j]][matrizMapa[i-1][j]] == false){
+								direcciones[matrizMapa[i][j]][matrizMapa[i-1][j]] = true;
 							}
 						}
 					}
 					if (i+1 < largo){
 						if (i%2 == 0){
+							// Abajo derecha.
 							if (matrizMapa[i][j] != matrizMapa[i+1][j]){
 								matrizMapaFrontera[i][j][2] = true;
+							}
+							if (direcciones[matrizMapa[i][j]][matrizMapa[i+1][j]] == false){
+								direcciones[matrizMapa[i][j]][matrizMapa[i+1][j]] = true;
+							}
+							// Arriba derecha
+							if (j-1 >= 0){
+								if (direcciones[matrizMapa[i][j]][matrizMapa[i+1][j-1]] == false){
+									direcciones[matrizMapa[i][j]][matrizMapa[i+1][j-1]] = true;
+								}
 							}
 						}
 						else {
 							if (j+1 < largo){
+								// Abajo derecha.
 								if (matrizMapa[i][j] != matrizMapa[i+1][j+1]){
 									matrizMapaFrontera[i][j][2] = true;
 								}
+								if (direcciones[matrizMapa[i][j]][matrizMapa[i+1][j+1]] == false){
+									direcciones[matrizMapa[i][j]][matrizMapa[i+1][j+1]] = true;
+								}
+								// Arriba Derecha
+								if (direcciones[matrizMapa[i][j]][matrizMapa[i+1][j]] == false){
+									direcciones[matrizMapa[i][j]][matrizMapa[i+1][j]] = true;
+								}
 							}
-						}
-						if (direcciones[matrizMapa[i][j]][matrizMapa[i+1][j]] == false){
-							direcciones[matrizMapa[i][j]][matrizMapa[i+1][j]] = true;
 						}
 					}
 					if (j-1 >= 0){
+						// Arriba
 						if (direcciones[matrizMapa[i][j]][matrizMapa[i][j-1]] == false){
 							direcciones[matrizMapa[i][j]][matrizMapa[i][j-1]] = true;
 						}
 					}
 					if (j+1 < largo){
+						// Abajo
 						if(matrizMapa[i][j] != matrizMapa[i][j+1]){
 							matrizMapaFrontera[i][j][1] = true;
 						}
 						if (direcciones[matrizMapa[i][j]][matrizMapa[i][j+1]] == false){
 							direcciones[matrizMapa[i][j]][matrizMapa[i][j+1]] = true;
-						}
-					}
-					if (j%2 == 0){
-						if (i-1 >= 0 && j-1 >= 0){
-							if (direcciones[matrizMapa[i][j]][matrizMapa[i-1][j-1]] == false){
-								direcciones[matrizMapa[i][j]][matrizMapa[i-1][j-1]] = true;
-							}
-						}
-						if (i-1 >= 0 && j+1 < largo){
-							if (direcciones[matrizMapa[i][j]][matrizMapa[i-1][j+1]] == false){
-								direcciones[matrizMapa[i][j]][matrizMapa[i-1][j+1]] = true;
-							}
-						}
-					}
-					else {
-						if (i+1 < largo && j-1 >= 0){
-							if (direcciones[matrizMapa[i][j]][matrizMapa[i+1][j-1]] == false){
-								direcciones[matrizMapa[i][j]][matrizMapa[i+1][j-1]] = true;
-							}
-						}
-						if (i+1 < largo && j+1 < largo){
-							if (direcciones[matrizMapa[i][j]][matrizMapa[i+1][j+1]] == false){
-								direcciones[matrizMapa[i][j]][matrizMapa[i+1][j+1]] = true;
-							}
 						}
 					}
 					cantidades[matrizMapa[i][j]] += 1;
